@@ -9,6 +9,10 @@ class Game {
 		this.military = config.military;
 
 		// The eventQ lists possible events that may or may not occur.
-		this.eventQ = []
+		this.eventQ = [];
+
+		// The eventRecord records the events that have occured and the player choices (if applicable)
+		// { event_id: [choices], event_id: [choices], ... }
+		this.eventRecord = {};
 	}
 }

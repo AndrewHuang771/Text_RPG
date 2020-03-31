@@ -14,16 +14,17 @@ function runEvent(event) {
 function updateEventQ(Session) {
 	// Add new events that are now allowed to occur. For instance, your popularity decreases past a threshold
 	for ( var i = 0; i < events.length; i ++ ) {
-		var valid = true;
-		for ( var prereq in events[i].prereqs ) {
-			if ( Object.prototype.hasOwnProperty.call(events[i].prereqs, prereq) ) {
+		if ( events[i].valid(Session) ) {
+			Session.eventQ.push(events[i]);
+		}
+	}
 
-			}
+	// Remove old events that can't happen anymore.
+	for ( var i = 0; i < Session.eventQ.length; i ++ ) {
+		if ( !Session.eventQ[i].valid() ) {
+			Session.eventQ.splice(i, 1);
 		}
-		if ( valid ) {
-			//add to eventQ
-		}
-	}	
+	}
 }
 
 $(document).ready( function() {
