@@ -1,0 +1,35 @@
+﻿body {
+	background-color: black;
+	font-family: 'GBasic', 'Arial', sans-serif;
+}
+
+@font-face {
+  font-family: 'GBasic';
+  src: url('./../fonts/galactic_basic/galbasic.ttf') format('truetype');
+}
+
+#titlecard {
+	position:absolute;
+	top: 200px;
+	left: 50%;
+	transform:translateX(-250px);
+	width: 500px;
+	height: 200px;
+	text-align: center;
+	color: white;
+}
+
+.centered {
+	width: 100%;
+	text-align:center;
+	color: white;
+}
+
+.center-button {
+	position:absolute;
+	top: 250px;
+	left: 50%;
+	width: 50px;
+	transform:translateX(-25px);
+	
+}
