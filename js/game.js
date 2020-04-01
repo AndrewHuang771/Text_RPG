@@ -24,7 +24,7 @@ class Game {
 		this.eventRecord = {};
 
 		for ( var i = 0; i < events.length; i ++ ) {
-			this.eventRecord[i.toString()] = [];
+			this.eventRecord[events[i].title] = [];
 		}
 	}
 }

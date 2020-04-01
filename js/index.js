@@ -1,8 +1,12 @@
-﻿function updateEventQ(Session) {
+﻿const eventRecordMaxLength = 10;
+const numPriorityLevels = 5;
+
+function updateEventQ(Session) {
 	// Add new events that are now allowed to occur. For instance, your popularity decreases past a threshold
 	for ( var i = 0; i < events.length; i ++ ) {
 		var event = events[i];
 		if ( event.valid(Session) && event.inQ === 0 ) {
+			event.id = i;
 			Session.eventQ[event.priority.toString()].push(event);
 			event.inQ = 1;
 		}
@@ -19,12 +23,35 @@
 		}
 	}
 }
+
+function executeEvent(Session) {
+	//Find an event to run, possible that no event occurs.
+	for ( var p = 0; p < numPriorityLevels; p ++ ) {
+		for ( var i = 0; i < Session.eventQ[p.toString()].length; i ++ ) {
+			var event = Session.eventQ[p.toString()][i];
+			if ( Math.random() <= event.probability ) {
+				var result = event.run(Session);
+				Session.eventRecord[event.title].push(result);
+
+				snipHistory(Session, event.title);
+
+				return;
+			}
+		}
+	}
+}
+
+// Keeps the EventRecord a limited length to avoid latency issues
+function snipHistory(Session, title) {
+	if ( Session.eventRecord[title].length > eventRecordMaxLength ) {
+		Session.eventRecord[title].shift();
+	}
+}
+
 var Session;
 $(document).ready( function() {
 	// See configs in config.js in info folder
 	Session = new Game(config[0]);
-	// See events in events.js in info folder
-
 	console.assert(Session.wealth, "Config not loaded");
 
 	var taxLoop = setInterval(() => {
@@ -34,18 +61,7 @@ $(document).ready( function() {
 	var eventLoop = setInterval(() => {
 
 		updateEventQ(Session);
-
-		//Find an event to run, possible that no event occurs.
-		for ( var p = 0; p < 5; p ++ ) {
-			for ( var i = 0; i < Session.eventQ[p.toString()].length; i ++ ) {
-				var event = Session.eventQ[p.toString()][i];
-				if ( Math.random() <= event.probability ) {
-					var result = event.run(Session);
-					Session.eventRecord[event.id.toString()].push(result);
-					break;
-				}
-			}
-		}
+		executeEvent(Session);
 
 	}, 1000);
 
