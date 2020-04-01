@@ -1,6 +1,6 @@
 var config = [
 {
-	"wealth": 10000000,
+	"wealth": 10,
 	"fame": 100,
 	"taxes": 0.13,
 	"GDP": 1000000000,

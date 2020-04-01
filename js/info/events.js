@@ -20,11 +20,12 @@ var events = [
 	title: "Public Uprising",
 	msg: "Your townsfolk are starting a revolt!",
 	// Given the event is in the eventQ, what are the odds it will activate?
-	probability: 0.05,
-	priority: 1,
+	probability: 1,
+	priority: 0,
+	inQ: 0,
 	// Is this event valid to be added onto the eventQ?
 	valid: (Session) => {
-		return true;
+		return Session.wealth > 9;
 	},
 	// What happens when you trigger the event
 	run: (Session) => {
@@ -37,8 +38,9 @@ var events = [
 	msg: "You have run out of money!",
 	probability: 1,
 	priority: 1,
+	inQ: 0,
 	valid: (Session) => {
-		return Session.wealth <= 0;
+		return Session.wealth <= 0 && Session.eventRecord["1"].length === 0;
 	},
 	run: (Session) => {
 		modifySession(Session, 0, -100, 0, 0, 0);
@@ -47,15 +49,15 @@ var events = [
 	id: 2,
 	title: "Receive income from mine",
 	msg: "Your mines are making profit!",
-	probability: 0.05,
-	priority: 1,
+	probability: 1,
+	priority: 3,
+	inQ: 0,
 	valid: (Session) => {
 		// If event 2 has already occured, then this event is valid.
-		return Session.eventRecord["2"].length > 0;
+		return Session.eventRecord["1"].length != 0;
 	},
 	run: (Session) => {
-		printMetadata(this);
-		modifySession(Session, -1000, -100, 0, 0, 0);
+		modifySession(Session, 1000, 0, 0, 0, 0);
 	}
 }
 ]

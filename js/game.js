@@ -9,10 +9,22 @@ class Game {
 		this.military = config.military;
 
 		// The eventQ lists possible events that may or may not occur.
-		this.eventQ = [];
+		//5 different levels of priority.
+		this.eventQ = {
+			0: [],
+			1: [],
+			2: [],
+			3: [],
+			4: [],
+			5: []
+		};
 
 		// The eventRecord records the events that have occured and the player choices (if applicable)
 		// { event_id: [choices], event_id: [choices], ... }
 		this.eventRecord = {};
+
+		for ( var i = 0; i < events.length; i ++ ) {
+			this.eventRecord[i.toString()] = [];
+		}
 	}
 }
