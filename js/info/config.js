@@ -29,4 +29,4 @@ var config = [
 	"taxes": 0.13,
 	"GDP": 1000000000,
 	"military": 10000,
-}]
+}];

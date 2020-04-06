@@ -1,6 +1,3 @@
-// ID of an event is its index in the array
-// prereqs: [       ]
-
 function modifySession(Session, wealth, fame, taxes, GDP, military) {
 	Session.wealth += wealth;
 	Session.fame += fame;
@@ -18,38 +15,55 @@ function numberOfPastEventRuns(Session, title) {
 	return Session.eventRecord[title].length;
 }
 
+function timeLastRun(Session, title) {
+	if ( Session.eventRecord[title].length > 0 ) {
+		return Session.eventRecord[title][Session.eventRecord[title].length - 1].time;
+	}
+	else {
+		return 0;
+	}
+}
+
+function checkIfTimedout(Session, title, delay) {
+	var d = new Date();
+	return d.getTime() - timeLastRun(Session, title) > delay;
+}
+
+function findEventIdxByTitle(title) {
+	for ( var i = 0; i < events.length; i ++ ) {
+		if ( events[i].title === title ) {
+			return i;
+		}
+	}
+	console.log("Event not found");
+	return -1;
+}
+
 var events = [
 
 {
 	title: "Introduction",
 	msg: "Welcome to the Game!",
-	// Given the event is in the eventQ, what are the odds it will activate?
 	probability: 1,
 	priority: 0,
 	inQ: 0,
-	// Is this event valid to be added onto the eventQ?
 	valid: (Session) => {
 		return numberOfPastEventRuns(Session, "Introduction") === 0;
 	},
-	// What happens when you trigger the event
 	run: (Session) => {
 		$("body").css("background-color","green");
-		console.log("RUNNING INTRO");
 	}
 },
 
 {
 	title: "Public Uprising",
 	msg: "Your townsfolk are starting a revolt!",
-	// Given the event is in the eventQ, what are the odds it will activate?
 	probability: 1,
 	priority: 1,
 	inQ: 0,
-	// Is this event valid to be added onto the eventQ?
 	valid: (Session) => {
-		return Session.wealth > 9;
+		return Session.wealth > 9 && checkIfTimedout(Session, "Public Uprising", 10000);
 	},
-	// What happens when you trigger the event
 	run: (Session) => {
 		modifySession(Session, -1000, -100, 0, 0, 0);
 		$("body").css("background-color","red");
@@ -85,4 +99,4 @@ var events = [
 	}
 }
 
-]
+];

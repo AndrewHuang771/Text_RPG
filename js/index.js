@@ -1,5 +1,15 @@
-﻿const eventRecordMaxLength = 10;
+﻿const configNum = 0;
+const eventRecordMaxLength = 10;
 const numPriorityLevels = 5;
+const eventInterval = 1000;
+const taxInterval = 1000;
+
+// Keeps the EventRecord a limited length to avoid latency issues
+function snipHistory(Session, title) {
+	if ( Session.eventRecord[title].length > eventRecordMaxLength ) {
+		Session.eventRecord[title].shift();
+	}
+}
 
 function updateEventQ(Session) {
 	// Add new events that are now allowed to occur. For instance, your popularity decreases past a threshold
@@ -13,7 +23,7 @@ function updateEventQ(Session) {
 	}			
 
 	// Remove old events that can't happen anymore.
-	for ( var p = 0; p < 5; p ++ ) {
+	for ( var p = 0; p < numPriorityLevels; p ++ ) {
 		for ( var i = 0; i < Session.eventQ[p.toString()].length; i ++ ) {
 			var event = Session.eventQ[p.toString()][i];
 			if ( !event.valid(Session) ) {
@@ -24,45 +34,53 @@ function updateEventQ(Session) {
 	}
 }
 
-function executeEvent(Session) {
+function runEvent(Session, event) {
+	var result = event.run(Session);
+	var d = new Date();
+	var data = {
+		result: result,
+		time: d.getTime(),
+	}
+
+	Session.eventRecord[event.title].push(data);
+	snipHistory(Session, event.title);
+}
+
+function findEventToRun(Session) {
 	//Find an event to run, possible that no event occurs.
 	for ( var p = 0; p < numPriorityLevels; p ++ ) {
 		for ( var i = 0; i < Session.eventQ[p.toString()].length; i ++ ) {
 			var event = Session.eventQ[p.toString()][i];
 			if ( Math.random() <= event.probability ) {
-				var result = event.run(Session);
-				Session.eventRecord[event.title].push(result);
-
-				snipHistory(Session, event.title);
-
-				return;
+				return event;
 			}
 		}
-	}
-}
-
-// Keeps the EventRecord a limited length to avoid latency issues
-function snipHistory(Session, title) {
-	if ( Session.eventRecord[title].length > eventRecordMaxLength ) {
-		Session.eventRecord[title].shift();
 	}
 }
 
 var Session;
 $(document).ready( function() {
 	// See configs in config.js in info folder
-	Session = new Game(config[0]);
+	Session = new Game(config[configNum]);
 	console.assert(Session.wealth, "Config not loaded");
 
 	var taxLoop = setInterval(() => {
 		// Session.wealth += Session.GDP * Session.taxes;
-	}, 1000);
+	}, taxInterval);
 	
 	var eventLoop = setInterval(() => {
 
 		updateEventQ(Session);
-		executeEvent(Session);
+		var event = findEventToRun(Session);
+		if ( event ) {
+			runEvent(Session, event);
+		}
 
-	}, 1000);
+	}, eventInterval);
 
 });
+
+/* Ideas:
+	-2-D Grid based city, can expand out new blocks... demolish old ones... etc
+	-For events, there is a "do nothing" option which happens by default if the player doesn't respond to the action in time.
+*/
